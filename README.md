@@ -1,7 +1,3 @@
-Here's an updated and more refined version of the README for *Khedut.com*, taking into account your project structure and a more professional presentation:
-
----
-
 # Khedut.com
 
 Khedut.com is a platform aimed at empowering farmers by providing them with essential resources, tools, and a seamless connection to agricultural products and services. The website connects the farming community with valuable information, weather updates, product listings, and more, helping farmers optimize their agricultural practices.
