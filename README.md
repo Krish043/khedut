@@ -79,7 +79,7 @@ Your local setup will now be ready. Visit `http://localhost:3000` to see the pla
 📸 Screenshots
 Take a look at how Khedut.com appears in action:
 
-<table> <tr> <td align="center"> <strong>🏠 Homepage</strong><br> <img src="home.png" alt="Homepage" width="300"/> </td> <td align="center"> <strong>🛒 Buy Products</strong><br> <img src="buy.png" alt="Buy Page" width="300"/> </td> </tr> <tr> <td align="center"> <strong>📦 Product Listings</strong><br> <img src="products.png" alt="Product Listings" width="300"/> </td> <td align="center"> <strong>📄 Schemes</strong><br> <img src="schemes.png" alt="Schemes" width="300"/> </td> </tr> <tr> <td align="center"> <strong>✍️ Blogs</strong><br> <img src="blogs.png" alt="Blogs" width="300"/> </td> <td align="center"> <strong>📊 Farmer Dashboard</strong><br> <img src="profile.png" alt="Dashboard" width="300"/> </td> </tr> </table>
+<table> <tr> <td align="center"> <strong>🏠 Homepage</strong><br> <img src="home.png" alt="Homepage" width="300"/> </td> <td align="center"> <strong>🛒 Buy Products</strong><br> <img src="buy.png" alt="Buy Page" width="300"/> </td> </tr> <tr> <td align="center"> <strong>📦 Product Listings</strong><br> <img src="products.png" alt="Product Listings" width="300"/> </td> <td align="center"> <strong>📄 Schemes</strong><br> <img src="schemes.png" alt="Schemes" width="300"/> </td> </tr> <tr> <td align="center"> <strong>✍️ Blogs</strong><br> <img src="blog.png" alt="Blogs" width="300"/> </td> <td align="center"> <strong>📊 Farmer Dashboard</strong><br> <img src="profile.png" alt="Dashboard" width="300"/> </td> </tr> </table>
 These visuals showcase the core functionality and user interface of the Khedut.com platform — from buying products to applying for schemes and engaging with community blogs.
 
 
