@@ -75,3 +75,15 @@ To run the project locally, follow these steps:
    ```
 
 Your local setup will now be ready. Visit `http://localhost:3000` to see the platform in action.
+
+Glimpses of the project:
+
+### **Homepage**
+![Homepage](home.png)
+
+### **Farmer Dashboard**
+![Farmer Dashboard](profile.png)
+
+### **Blogging Section**
+![Blogging Section](blog.png)
+
