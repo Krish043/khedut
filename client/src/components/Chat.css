@@ -1,0 +1,17 @@
+/* Custom scrollbar styles */
+.flex-1::-webkit-scrollbar {
+    width: 7px; /* Adjust the width as needed */
+}
+
+.flex-1::-webkit-scrollbar-thumb {
+    background-color: #B0B0B0; /* Grey color */
+    border-radius: 10px;
+}
+
+.flex-1::-webkit-scrollbar-thumb:hover {
+    background-color: #909090; /* Darker grey on hover */
+}
+
+.flex-1::-webkit-scrollbar-track {
+    background-color: #F0F0F0; /* Lighter grey for the track */
+}
