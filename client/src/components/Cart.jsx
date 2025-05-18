@@ -59,7 +59,6 @@ const Cart = () => {
         mail: user.email,
         prodId: prodId,
       });
-
       console.log("Added to cart:", response.data);
       toast.success("Added to cart!");
       fetchProducts(); // Refresh cart
@@ -106,7 +105,6 @@ const Cart = () => {
       );
 
       const session = await response.json();
-      // console.log("Stripe session:", session);
 
       const result = await stripe.redirectToCheckout({ sessionId: session.id });
       toast.success("Payment successful");
@@ -226,63 +224,6 @@ const Cart = () => {
       ) : (
         <>
           <div className="space-y-4">
-            {/* {prodDetails.map((product, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-4 bg-white border border-green-100 shadow-sm rounded-lg p-4 hover:shadow-md transition"
-              >
-                <img
-                  src={product.uri}
-                  alt={product.productname}
-                  className="w-24 h-24 object-cover rounded-md border"
-                />
-                <div className="flex-1 space-y-1">
-                  <h2 className="text-base font-semibold text-green-900">
-                    {product.productname}
-                  </h2>
-                  <div className="text-sm text-muted-foreground">
-                    <p>
-                      <span className="font-medium">Price:</span> ₹
-                      {product.price}/kg
-                    </p>
-                    <p>
-                      <span className="font-medium">Quantity:</span>{" "}
-                      {product.totalQuantity} kg
-                    </p>
-                    <p>
-                      <span className="font-medium">Pack of:</span>{" "}
-                      {product.totalQuantity / product.count} kg
-                    </p>
-                    <p>
-                      <span className="font-medium">Amount:</span> ₹
-                      {product.price * product.totalQuantity}
-                    </p>
-                    <p>
-                      <span className="font-medium">Rating:</span> ⭐{" "}
-                      {product.rating}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2 min-w-[120px]">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-green-700 border-green-600 hover:bg-green-100"
-                    onClick={() => handleAddToCart(product._id)}
-                  >
-                    Add 1 Pack
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-red-700 border-red-600 hover:bg-red-100"
-                    onClick={() => handleRemoveFromCart(product._id)}
-                  >
-                    Remove 1 Pack
-                  </Button>
-                </div>
-              </div>
-            ))} */}
             {prodDetails.map((product, index) => (
               <div
                 key={index}

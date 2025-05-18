@@ -33,9 +33,6 @@ const images = [
   },
 ];
 
-
-
-
 const Home = () => {
 
   const localAuth = localStorage.getItem('auth');

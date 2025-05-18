@@ -23,6 +23,7 @@ import AddBlog from "./components/AddBlog";
 import Blogs from "./components/Blogs";
 import AddProduct from "./components/AddProduct";
 import Cart from "./components/Cart";
+import Rating from "./components/Rating";
 function App() {
   // const auth=JSON.parse(localStorage.getItem("auth"));
   // {console.log(auth.name);}
@@ -59,6 +60,8 @@ function App() {
             <Route path="/schemes" element={<Schemes />}></Route>
             <Route path="/add-scheme" element={<Apply />}></Route>
             <Route path="/learn" element={<Learn />}></Route>
+            <Route path="/rate" element={<Rating />}></Route>
+            
 
             {auth.auth && auth.role === "farmer" && (
               <Route path="/sell" element={<Sell />}></Route>

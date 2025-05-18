@@ -1,28 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+"use client";
 
-const BlogDetail = () => {
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+
+export default function BlogDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [blog, setBlog] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [author, setAuthor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/blog/${id}`);
-        setBlog(response.data);
-        
-        if (response.data.author) {
-          const authorResponse = await axios.get(`http://localhost:3000/users/${response.data.author}`);
-          setAuthor(authorResponse.data);
+        const blogRes = await axios.get(`http://localhost:3000/blog/${id}`);
+        setBlog(blogRes.data);
+
+        if (blogRes.data.author) {
+          const authorRes = await axios.get(
+            `http://localhost:3000/users/id/${blogRes.data.author}`
+          );
+          setAuthor(authorRes.data);
         }
       } catch (err) {
-        console.error('Error fetching blog:', err);
-        setError('Error fetching blog');
+        console.error(err);
+        setError("Error fetching blog");
       } finally {
         setLoading(false);
       }
@@ -31,79 +41,99 @@ const BlogDetail = () => {
     fetchBlog();
   }, [id]);
 
-  if (loading) {
-    return <p className="text-center text-green-700">Loading...</p>;
-  }
-
-  if (error) {
-    return <p className="text-center text-red-700">{error}</p>;
-  }
-
-  if (!blog) {
-    return <p className="text-center text-gray-700">Blog not found.</p>;
-  }
+  if (loading)
+    return <p className="text-center pt-24 text-green-700">Loading...</p>;
+  if (error || !blog)
+    return (
+      <p className="text-center pt-24 text-red-600">
+        {error || "Blog not found"}
+      </p>
+    );
 
   return (
-    <div className="max-w-screen-lg mx-auto p-6 mt-20">
-      <div className="flex flex-col md:flex-row items-stretch space-y-6 md:space-x-6 md:space-y-0 p-2 m-4">
-        
-        <div className="w-full md:w-2/3 flex flex-col justify-between">
-          <img 
-            src={blog.image} 
-            alt={blog.title} 
-            className="w-full h-[250px] sm:h-[300px] md:h-[370px] lg:h-[400px] object-cover rounded-lg shadow-lg"
+    <div className="max-w-4xl mx-auto px-4 pt-24 pb-16">
+      {/* Top Section: Image + Author Side by Side */}
+      <div className="max-w-screen-md mx-auto">
+        {/* Blog Image (Full Width) */}
+        <div
+          className="rounded-xl overflow-hidden shadow-lg border border-gray-200"
+          style={{ maxHeight: "300px" }}
+        >
+          <img
+            src={blog.image}
+            alt={blog.title}
+            className="w-full h-full object-cover object-center"
+            style={{ maxHeight: "300px", minHeight: "250px" }}
           />
-          
-          <div className="flex justify-between mt-4">
-            <div className="text-sm text-gray-600">
-              <strong>Likes:</strong> {blog.likesCount || 0}
-            </div>
-            <div className="text-sm text-gray-600">
-              <strong>Shares:</strong> {blog.shareCount || 0}
-            </div>
-          </div>
         </div>
 
-        <div className="w-full md:w-1/3">
-          <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 flex flex-col items-center h-full">
-            <div className="mb-4">
-              <h2 className="text-center text-xl font-bold text-gray-700">Posted by</h2>
+        {/* Author Info Bar */}
+        <div className="relative -mt-6 mx-4">
+          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3 flex items-center">
+            {/* Author Avatar */}
+            <div className="flex-shrink-0 mr-3">
               {author?.img && (
-                <img 
-                  src={author.img} 
-                  alt={`${author.name}'s profile`} 
-                  className="w-28 h-28 border-black shadow-lg transform hover:scale-105 transition-transform duration-300"
+                <img
+                  src={author.img}
+                  alt={author.name}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
                 />
               )}
             </div>
-            <div className="text-center">
-              <h2 className="text-xl font-bold text-gray-700">{author?.name}</h2>
-              <p className="text-sm text-gray-500">{author?.email}</p>
-              <p className="text-sm text-gray-500">Role: {author?.role}</p>
-              <p className="text-sm text-gray-500">
-                <strong>Created At:</strong> {new Date(blog.createdAt).toLocaleDateString()}
-              </p>
+
+            {/* Author Details */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-medium text-gray-500 mb-0.5">
+                    Posted by
+                  </h3>
+                  <div className="flex items-center space-x-2">
+                    <h2 className="text-base font-semibold text-gray-800 truncate">
+                      {author?.name}
+                    </h2>
+                    {author?.role && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 capitalize">
+                        {author.role}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Stats */}
+                <div className="flex items-center space-x-4 text-sm">
+                  <span className="text-gray-500 text-xs">
+                    {new Date(blog.createdAt).toLocaleDateString()}
+                  </span>
+                  <span className="flex items-center space-x-1 text-gray-700">
+                    <span>❤️ {blog.likesCount || 0}</span>
+                    <span>•</span>
+                    <span>🔁 {blog.shareCount || 0}</span>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        
+
+        {/* Rest of your blog content would go here */}
       </div>
 
-      <div className="text-lg text-gray-700 mb-4">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">{blog.title}</h1>
-        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: blog.content }} />
+      {/* Blog Content */}
+      <div className="mt-10 prose prose-lg max-w-none">
+        <h1 className="text-4xl font-bold text-gray-800 mb-4">{blog.title}</h1>
+        <div dangerouslySetInnerHTML={{ __html: blog.content }} />
       </div>
 
-      <div className="flex justify-center mt-10">
-        <button
-          onClick={() => navigate('/')}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline duration-300"
+      {/* Back Button */}
+      <div className="flex justify-center mt-12">
+        <Button
+          onClick={() => navigate("/")}
+          className="rounded-full bg-green-600 hover:bg-green-700 text-white px-6 py-2 font-semibold shadow-lg transition"
         >
-          Back to Home
-        </button>
+          ← Back to Home
+        </Button>
       </div>
     </div>
   );
-};
-
-export default BlogDetail;
+}

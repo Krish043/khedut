@@ -19,11 +19,22 @@ import {
 } from "@/components/ui/pagination"; // Import pagination components
 import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star } from "lucide-react";
+import { Star, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+
 const Buy = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [bestsellers, setBestsellers] = useState([]);
   const [popup, setPopup] = useState({ show: false, id: "" });
@@ -31,10 +42,10 @@ const Buy = () => {
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [users, setUsers] = useState({});
-  const navigate = useNavigate();
-
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8; // Change this value as per your requirement
+  const [hoverRating, setHoverRating] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const addToCart = async (productId) => {
     try {
@@ -125,6 +136,11 @@ const Buy = () => {
       });
   };
 
+  const handleClosePopup = () => {
+    setPopup({ show: false, id: "" });
+    setRating(0);
+  };
+
   const categorizedProducts = products.reduce((categories, product) => {
     categories[product.category] = categories[product.category] || [];
     categories[product.category].push(product);
@@ -133,12 +149,32 @@ const Buy = () => {
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category === "All" ? "All Products" : category);
+    setSearchTerm("");
+    setCurrentPage(1); // Reset to first page when category changes
   };
 
-  const filteredProducts =
-    selectedCategory === "All Products"
-      ? products
-      : products.filter((product) => product.category === selectedCategory);
+  const filterProducts = () => {
+    let filtered = products;
+
+    // Filter by category first
+    if (selectedCategory !== "All Products") {
+      filtered = filtered.filter(
+        (product) => product.category === selectedCategory
+      );
+    }
+
+    // Then filter by search term if it exists
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter((product) =>
+        product.productname.toLowerCase().includes(term)
+      );
+    }
+
+    return filtered;
+  };
+
+  const filteredProducts = filterProducts();
 
   // Pagination Logic
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -153,33 +189,48 @@ const Buy = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-50 p-8 mt-12 w-[100vw]">
-      <DropdownMenu onOpenChange={setIsDropdownOpen}>
-        <div className="flex w-full p-2 h-[80px] items-center justify-between">
-          <DropdownMenuTrigger className="flex items-center text-4xl font-bold text-green-800 cursor-pointer">
-            {selectedCategory}
-            {isDropdownOpen ? (
-              <FaChevronUp className="ml-2" />
-            ) : (
-              <FaChevronDown className="ml-2" />
-            )}
-          </DropdownMenuTrigger>
-        </div>
-        <DropdownMenuContent>
-          <DropdownMenuLabel>Select Category</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => handleCategoryClick("All")}>
-            All Products
-          </DropdownMenuItem>
-          {Object.keys(categorizedProducts).map((category) => (
-            <DropdownMenuItem
-              key={category}
-              onClick={() => handleCategoryClick(category)}
-            >
-              {category}
+      <div className="flex items-center justify-end p-2 h-[80px] w-full">
+        <DropdownMenu onOpenChange={setIsDropdownOpen}>
+          <div className="flex w-full p-2 h-[80px] items-center justify-between">
+            <DropdownMenuTrigger className="flex items-center text-4xl font-bold text-green-800 cursor-pointer">
+              {selectedCategory}
+              {isDropdownOpen ? (
+                <FaChevronUp className="ml-2" />
+              ) : (
+                <FaChevronDown className="ml-2" />
+              )}
+            </DropdownMenuTrigger>
+          </div>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>Select Category</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleCategoryClick("All")}>
+              All Products
             </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+            {Object.keys(categorizedProducts).map((category) => (
+              <DropdownMenuItem
+                key={category}
+                onClick={() => handleCategoryClick(category)}
+              >
+                {category}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <div className="relative w-96">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-800 h-5 w-5" />
+          <input
+            type="text"
+            placeholder="Search products by name..."
+            className="w-full pl-10 pr-4 py-2 rounded-xl border bg-white border-green-300 text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-400 shadow-sm"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
         {currentProducts.length > 0 ? (
@@ -246,50 +297,60 @@ const Buy = () => {
               >
                 Add to Cart
               </button>
+              <button
+                onClick={() => setPopup({ show: true, id: product._id })}
+                className="w-full mt-2 py-2 text-sm font-semibold rounded-lg bg-yellow-200 text-yellow-700 border-yellow-600 hover:bg-yellow-300 transition"
+              >
+                Rate Product
+              </button>
             </div>
           ))
         ) : (
           <p className="text-2xl text-gray-600 col-span-full text-center">
-            No products available.
+            {searchTerm
+              ? "No products match your search."
+              : "No products available."}
           </p>
         )}
       </div>
 
-      <div className="flex justify-center mt-6">
-        <Pagination>
-          <PaginationPrevious
-            className="text-slate-600 hover:cursor-pointer"
-            onClick={() => paginate(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </PaginationPrevious>
-          <PaginationContent>
-            {[...Array(totalPages)].map((_, index) => (
-              <PaginationItem key={index + 1}>
-                <PaginationLink
-                  className={
-                    currentPage === index + 1
-                      ? "bg-green-500 text-white"
-                      : "hover:cursor-pointer"
-                  }
-                  onClick={() => paginate(index + 1)}
-                  active={currentPage === index + 1}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-          </PaginationContent>
-          <PaginationNext
-            className="text-slate-600 hover:cursor-pointer"
-            onClick={() => paginate(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </PaginationNext>
-        </Pagination>
-      </div>
+      {filteredProducts.length > 0 && (
+        <div className="flex justify-center mt-6">
+          <Pagination>
+            <PaginationPrevious
+              className="text-slate-600 hover:cursor-pointer"
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </PaginationPrevious>
+            <PaginationContent>
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index + 1}>
+                  <PaginationLink
+                    className={
+                      currentPage === index + 1
+                        ? "bg-green-500 text-white"
+                        : "hover:cursor-pointer"
+                    }
+                    onClick={() => paginate(index + 1)}
+                    active={currentPage === index + 1}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+            </PaginationContent>
+            <PaginationNext
+              className="text-slate-600 hover:cursor-pointer"
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </PaginationNext>
+          </Pagination>
+        </div>
+      )}
 
       <h2 className="text-4xl font-bold text-green-800 text-center mt-16 mb-12">
         🥇 Our Top Products
@@ -299,36 +360,88 @@ const Buy = () => {
         {bestsellers.length > 0 ? (
           bestsellers
             .sort((a, b) => b.rating - a.rating)
-            .map((seller, index) => (
-              <Card
-                key={index}
-                className={cn(
-                  "flex items-center justify-between px-6 py-4 shadow-sm hover:shadow-md transition rounded-xl border",
-                  index === 0 && "bg-green-50 border-green-200"
-                )}
-              >
-                <div className="flex items-center gap-4">
-                  <Avatar className="bg-green-100 text-green-800">
-                    <AvatarFallback>{index + 1}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="text-lg font-semibold text-green-900">
-                      {seller.productname}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      by @{users[seller.email] || seller.email.split("@")[0]}
-                    </p>
-                  </div>
-                </div>
+            .map((seller, index) => {
+              // Badge colors for top 3
+              const badgeColors = [
+                "bg-yellow-400 text-yellow-800", // Gold
+                "bg-gray-300 text-gray-800", // Silver
+                "bg-amber-700 text-white", // Bronze
+              ];
 
-                <div className="flex items-center gap-2 text-sm">
-                  <Star className="w-4 h-4 text-yellow-500" />
-                  <span className="font-semibold text-gray-800">
-                    {seller.rating.toFixed(1)}
-                  </span>
-                </div>
-              </Card>
-            ))
+              return (
+                <Card
+                  key={index}
+                  className={cn(
+                    "flex flex-col sm:flex-row items-center sm:justify-between px-6 py-4 shadow-sm hover:shadow-md transition rounded-xl border relative",
+                    index === 0 && "bg-green-50 border-green-200"
+                  )}
+                >
+                  {/* #1 Bestseller Label */}
+                  {index === 0 && (
+                    <div className="absolute -top-3 -left-3 bg-yellow-400 text-white text-xs font-bold px-2 py-1 rounded-tr-lg rounded-bl-lg shadow-md">
+                      #1 Bestseller
+                    </div>
+                  )}
+
+                  {/* Product Image */}
+                  <img
+                    src={seller.uri || "/default-product.png"}
+                    alt={seller.productname}
+                    className="w-24 h-24 rounded-lg object-cover mr-6"
+                  />
+
+                  {/* Left content: Badge and product info */}
+                  <div className="flex items-center gap-4 flex-1 w-full sm:w-auto">
+                    {/* Colored number badge for top 3, else default green */}
+                    <div
+                      className={cn(
+                        "flex items-center justify-center w-9 h-9 rounded-full font-bold text-lg",
+                        index < 3
+                          ? badgeColors[index]
+                          : "bg-green-100 text-green-800"
+                      )}
+                    >
+                      {index + 1}
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold text-green-900">
+                        {seller.productname}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        by @{users[seller.email] || seller.email.split("@")[0]}
+                      </p>
+                      <div className="flex items-center gap-1 mt-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={16}
+                            className={`${
+                              i < Math.round(seller.rating)
+                                ? "text-yellow-500 fill-yellow-500"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        ))}
+                        <span className="ml-2 text-sm font-semibold text-gray-800">
+                          {seller.rating.toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Add to Cart button */}
+                  <div className="mt-4 sm:mt-0 w-full sm:w-auto">
+                    <button
+                      onClick={() => addToCart(seller._id)}
+                      className="w-full sm:w-auto px-4 py-2 text-sm font-semibold rounded-lg bg-green-200 text-green-700 border border-green-600 hover:bg-green-100 transition"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                </Card>
+              );
+            })
         ) : (
           <p className="text-center text-xl text-gray-600">
             No Top Products available.
@@ -336,50 +449,55 @@ const Buy = () => {
         )}
       </div>
 
-      {popup.show && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-8 rounded-lg shadow-lg w-1/3 text-center">
-            <h3 className="text-2xl font-semibold mb-4 text-green-800">
-              Thank You!
-            </h3>
-            <p className="text-lg text-gray-800">
-              Thanks for buying from {popup.email}!
-            </p>
-            <div className="mt-4">
-              <label className="block text-gray-700 mb-2">
-                Rate the Seller (1-5 stars):
-              </label>
-              <select
-                value={rating}
-                required
-                onChange={(e) => setRating(Number(e.target.value))}
-                className="border p-2 bg-white rounded w-full"
-              >
-                <option value="" disabled>
-                  Select a rating
-                </option>
-                <option value={1}>1 - Very Poor</option>
-                <option value={2}>2 - Poor</option>
-                <option value={3}>3 - Average</option>
-                <option value={4}>4 - Good</option>
-                <option value={5}>5 - Excellent</option>
-              </select>
+      <Dialog open={popup.show} onOpenChange={handleClosePopup}>
+        <DialogContent className="sm:max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-green-700 text-2xl font-bold">
+              Share Your Feedback
+            </DialogTitle>
+            <DialogDescription className="text-gray-700">
+              How was your experience with this product?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-4 space-y-2">
+            <Label className="text-sm text-gray-700">
+              Rate the Quality of the Product:
+            </Label>
+            <div className="flex gap-1 mt-2">
+              {[1, 2, 3, 4, 5].map((starValue) => (
+                <Star
+                  key={starValue}
+                  size={28}
+                  className={`cursor-pointer transition-colors ${
+                    starValue <= (hoverRating || rating)
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "text-gray-300"
+                  }`}
+                  onMouseEnter={() => setHoverRating(starValue)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => setRating(starValue)}
+                />
+              ))}
             </div>
-            <button
+          </div>
+
+          <DialogFooter className="mt-6 flex justify-end gap-2">
+            <Button
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleClosePopup}
+            >
+              Cancel
+            </Button>
+            <Button
               onClick={handleSubmitRating}
-              className="mt-4 py-2 px-4 bg-green-500 text-white rounded-lg shadow-lg font-semibold transform transition hover:bg-green-600 hover:scale-105"
+              className="bg-green-600 hover:bg-green-700 text-white"
             >
               Submit Rating
-            </button>
-            <button
-              onClick={handleClosePopup}
-              className="mt-4 py-2 px-4 bg-gray-500 text-white rounded-lg shadow-lg font-semibold transform transition hover:bg-gray-600 hover:scale-105"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

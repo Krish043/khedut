@@ -67,6 +67,7 @@ router.get("/user/:email", async (req, res) => {
         _id: product._id,
         productname: product.productname,
         price: product.price,
+        email: product.email,
         description: product.description,
         uri: product.uri,
         rating: product.rating,
