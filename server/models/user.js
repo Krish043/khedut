@@ -33,6 +33,18 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+  productProfits: [
+  {
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+    },
+    totalProfit: {
+      type: Number,
+      default: 0,
+    },
+  },
+],
 });
 
 userSchema.methods.generateAuthToken = function () {

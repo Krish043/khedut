@@ -66,6 +66,7 @@ router.get("/email/:email", async (req, res) => {
       img: user.img,
       appliedSchemes: user.appliedSchemes,
       cart: user.cart,
+      sales: user.productProfits,
     });
   } catch (error) {
     console.error("Error fetching user:", error);

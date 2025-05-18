@@ -134,10 +134,35 @@ router.post("/create-checkout-session", async (req, res) => {
       success_url: "http://localhost:5173/buy",
       cancel_url: "http://localhost:5173/cart",
     });
+for (const product of products) {
+      const productDoc = await Product.findById(product._id);
+      if (!productDoc) continue;
+
+      const revenue = product.price * product.totalQuantity;
+
+      const farmer = await User.findOne({ email: productDoc.email });
+      if (!farmer) continue;
+
+      const profitEntry = farmer.productProfits.find(entry =>
+        entry.productId.toString() === product._id
+      );
+
+      if (profitEntry) {
+        profitEntry.totalProfit += revenue;
+      } else {
+        farmer.productProfits.push({
+          productId: product._id,
+          totalProfit: revenue,
+        });
+      }
+
+      await farmer.save();
+    }
+
 
     res.json({ id: session.id });
   } catch (error) {
-    console.error("Stripe session error:", error);
+    console.error("Checkout error:", error);
     res.status(500).json({ error: "Failed to create checkout session" });
   }
 });

@@ -160,13 +160,6 @@ export default function Navbar() {
                     <ShoppingCartIcon aria-hidden="true" className="h-6 w-6" />
                   </button>
                 )}
-                <button
-                  type="button"
-                  className="relative rounded-full bg-white p-1 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600"
-                >
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon aria-hidden="true" className="h-6 w-6" />
-                </button>
 
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
